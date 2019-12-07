@@ -53,3 +53,16 @@ Mc[i+1]<-Mc[i]+r*Mc[i]*(1-(999900+Mc[i])/K)+0.5*Mc[i]
 return(Mc)
 }
 
+
+
+##fuction that works
+prueba3<-function(Nc0=50,r=0.1,K=1000000,time=1000){
+  Nc<-numeric(time)
+  Nc0<-50
+  Nc[1]<-Nc0
+  for(i in 1:(time-1)){
+    Nc[i+1]<-Nc[i]+r*Nc[i]*(1-(Nc[i]+100)/K)
+  }
+  return(Nc)
+}
+### 350
