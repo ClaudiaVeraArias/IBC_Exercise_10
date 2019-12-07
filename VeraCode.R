@@ -66,3 +66,24 @@ prueba3<-function(Nc0=50,r=0.1,K=1000000,time=1000){
   return(Nc)
 }
 ### 350
+
+
+
+### Don't work :(
+
+Test1<-function(Nc0=10000,Mc0=1,r=0.1,K=1000000,time=500){
+  Nc<-numeric(time)
+  Nc0<-10000
+  Nc[1]<-Nc0
+  Mc<-numeric(time)
+  Mc0<-1
+  Mc[1]<-Mc0
+  for(i in 1:(time-1)){
+    if(i<=100)
+    Mc[i+1]<-Mc[i]+r*Mc[i]*(1-(999900+Mc[i])/K)-Mc[i]*0.5
+  }else{
+    Nc[i+1]<-Nc[i]+r*Nc[i]*(1-(Nc[i]+100)/K)-Nc[i]*-0.1
+  }
+  return(Nc)
+  return(Mc)
+}
