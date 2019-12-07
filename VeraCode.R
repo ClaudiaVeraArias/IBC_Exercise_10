@@ -32,3 +32,24 @@ N(t+1)=N[t]+rN*N[t](1-((N[t]+M[t])/K))
 M(t+1)=M[t]+rM*M[t](1-((N[t]+M[t])/K))
 
     
+#### may be
+
+Nc<-numeric(time)
+Mc<-numeric(time)
+Nc0<-0
+Mc0<-50
+Nc[1]<-Nc0
+Mc[1]<-Mc0
+K=1000000
+r=0.1
+time=50
+test<-function(M0=50,r=0.1,K=100,time=50){
+  Mc<-numeric(time)
+  Mc0<-50
+  Mc[1]<-Mc0
+   for(i in 1:(time-1)){
+Mc[i+1]<-Mc[i]+r*Mc[i]*(1-(999900+Mc[i])/K)+0.5*Mc[i]
+}
+return(Mc)
+}
+
