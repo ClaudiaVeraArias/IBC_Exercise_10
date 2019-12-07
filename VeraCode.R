@@ -87,3 +87,59 @@ Test1<-function(Nc0=10000,Mc0=1,r=0.1,K=1000000,time=500){
   return(Nc)
   return(Mc)
 }
+
+
+
+
+#### other
+#initial data
+N0=50
+M0=1
+r=0.1
+K=1000000
+time=350
+Ns=numeric(length = time)
+Ns[1]=N0
+Ms=numeric(length = time)
+Ms[1]=M0
+
+rNT=-0.1
+
+#simulation
+for(i in 1:200){
+  Ns[i+1]=Ns[i]+r*Ns[i]*(1-(Ns[i]+Ms[i])/K)-Ns[i]*rNT
+}
+
+#plot
+sim<-data.frame(time=1:length(Ns),N=Ns)
+ggplot(data=sim,aes(x=time,y=N))+geom_line()+theme_classic()
+
+
+
+
+
+#function
+
+popsim<-function(N0=1,M0=1,r=0.2,K=1000000,time=350,rNT=-0.1){
+Ns=numeric(length = time)
+Ns[1]=N0
+Ms=numeric(length = time)
+Ms[1]=M0
+for(i in 1:350){
+  Ns[i+1]=Ns[i]+r*Ns[i]*(1-(Ns[i]+Ms[i])/K)-Ns[i]*rNT
+}
+return(Ns)
+return(Ms)
+}
+
+Tumor=data.frame(time=1:351)
+Tumor$Mutant<-popsim(rNT = 0.5)
+Tumor$NoMutant<-popsim()
+Tumor$NoCancer<-popsim(rNT = 0)
+
+dim(Tumor)
+ggplot(data=Tumor)+
+  geom_line(aes(x=time,y=Mutant),col="blue")+
+  geom_line(aes(x=time,y=NoMutant),col="pink")+
+  geom_line(aes(x=time,y=NoCancer),col="purple")+
+  theme_classic()
