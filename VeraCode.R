@@ -67,3 +67,50 @@ ggplot(data=Tumor)+
 
 
 
+###Dic8
+#parameters
+K=1000000
+KN=999900
+KM=100
+r=0.1
+rN=-0.1
+rM=-0.5
+time=365
+N0=1
+M0=0
+
+#equation
+N <- numeric(length = time)
+M <- numeric(length = time)
+
+N[1]=N0
+M[1]=M0
+
+N[i+1]=N[i]+r*N[i]*(1-(N[i]+M[i])/K)-N[i]*rN
+M[i+1]=M[i]+r*M[i]*(1-(N[i]+M[i])/K)-M[i]*rM
+
+# loop
+
+Drug<- function (N0=1, M0=0, r=0.1, K=1000000, rM=0.5,rN=0.9){
+  for (i in 1:(time-1)){
+  if(i<=100){
+    Mu<-M[i+1]=M[i]+r*M[i]*(1-(N[i]+M[i])/K)-M[i]*rM
+  }else{
+    No<-N[i+1]=N[i]+r*N[i]*(1-(N[i]+M[i])/K)-N[i]*rN
+  }
+  V<-cbind(Mu+No)
+  }
+}
+
+Drug1<-data.frame(time-1)
+Drug1$Mutant<-Drug(rNT=0)
+Drug1$NoMutant<-Drug(rMT=0)
+Drug1$NoDrug<-Drug(rMT=0,rNT=0)
+
+dim(Drug1)
+
+ggplot(data=Drug1)+
+  geom_line(aes(x=time,y=Mutant),col="blue")+
+  geom_line(aes(x=time,y=NoMutant),col="pink")+
+  geom_line(aes(x=time,y=NoDrug),col="purple")+
+  theme_classic()
