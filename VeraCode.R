@@ -114,3 +114,45 @@ ggplot(data=Drug1)+
   geom_line(aes(x=time,y=NoMutant),col="pink")+
   geom_line(aes(x=time,y=NoDrug),col="purple")+
   theme_classic()
+
+
+#####
+
+#initial conditions
+
+N0=99
+M0=1
+r=0.1
+rM=0.05
+rN=-0.1
+K=1000000
+time=364
+
+#equations
+N[i+1]=N[i]+r*N[i]*(1-(N[i]+M[i])/K)
+M[i+1]=M[i]+r*M[i]*(1-(N[i]+M[i])/K)
+
+N[i+1]=N[i]+rN*N[i]*(1-(N[i]+M[i])/K)
+M[i+1]=M[i]+rM*M[i]*(1-(N[i]+M[i])/K)
+
+N <- numeric(length = time)
+M <- numeric(length = time)
+N0=99
+M0=1
+N[1]=N0
+M[1]=M0
+
+#loop
+Population <- function(N0=99, M0=1, r=0.1, rM=0.05, rN=-0.1, K=1000000, time=364) {
+  for(i in 1:(time-1)){
+  #No treatment
+  if(i < 182){
+    N[i+1]=N[i]+r*N[i]*(1-(N[i]+M[i])/K)
+    M[i+1]=M[i]+r*M[i]*(1-(N[i]+M[i])/K)
+  }else{
+    N[i+1]=N[i]+rN*N[i]*(1-(N[i]+M[i])/K)
+    M[i+1]=M[i]+rM*M[i]*(1-(N[i]+M[i])/K)
+  }
+  return(c<-data.frame(N,M))
+  }
+}
