@@ -118,6 +118,7 @@ ggplot(data=Drug1)+
 
 #####
 
+#1______________________________________
 #initial conditions
 
 N0=99
@@ -146,13 +147,54 @@ M[1]=M0
 Population <- function(N0=99, M0=1, r=0.1, rM=0.05, rN=-0.1, K=1000000, time=364) {
   for(i in 1:(time-1)){
   #No treatment
-  if(i < 182){
+  if(i < 0.5*time){
     N[i+1]=N[i]+r*N[i]*(1-(N[i]+M[i])/K)
     M[i+1]=M[i]+r*M[i]*(1-(N[i]+M[i])/K)
   }else{
     N[i+1]=N[i]+rN*N[i]*(1-(N[i]+M[i])/K)
     M[i+1]=M[i]+rM*M[i]*(1-(N[i]+M[i])/K)
   }
-  return(c<-data.frame(N,M))
+    return(data.frame(N,M))
   }
 }
+
+graph<-Population()
+
+
+
+ggplot(data=graph)+
+  #geom_line(aes(x=time,y=N),col="blue")+
+  geom_line(aes(x=time,y=M),col="pink")+
+  #geom_line(aes(x=time,y=NoDrug),col="purple")+
+  theme_classic()
+#2____________________________________
+popsim<-function(N0=99,M0=1,r=0.1,K=1000000,time=350,rNT=-0.1,rMT=0.05,g=1){
+  Ns=numeric(length = time)
+  Ns[1]=N0
+  Ms=numeric(length = time)
+  Ms[1]=M0
+  for(i in 1:350){
+    if(i < 150){
+      Ns[i+1]=Ns[i]+r*Ns[i]*(1-(Ns[i]+Ms[i])/K)
+      Ms[i+1]=Ms[i]+r*Ms[i]*(1-(Ns[i]+Ms[i])/K)*g
+    }else(i > 151){
+      Ns[i+1]=Ns[i]+rNT*Ns[i]*(1-(Ns[i]+Ms[i])/K)
+      Ms[i+1]=Ms[i]+rMT*Ns[i]*(1-(Ns[i]+Ms[i])/K)*g
+    }
+    return(Ns)
+    return(Ms)
+  }
+}
+
+Tumor=data.frame(time=1:350)
+Tumor$N<-popsim(g = 0)#, K=100)
+#Tumor$NoMutant<-popsim(r= -0.1)
+Tumor$M<-popsim()
+
+dim(Tumor)
+ggplot(data=Tumor)+
+  geom_line(aes(x=time,y=N),col="blue")+
+  #geom_line(aes(x=time,y=NoMutant),col="pink")+
+  geom_line(aes(x=time,y=M),col="purple")+
+  theme_classic()
+
