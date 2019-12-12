@@ -7,194 +7,76 @@
 # rate in the absence of the drug and the non-mutant sub-population declines rapidly. 
 # The model we will use to represent the growth of the two sub-populations is this:
 
- ## set the working directory
+    ## set the working directory
+
 setwd('/Users/claudiaveraarias/Documents/ND_Classes/Fall_Semester_2019/Biocomputing/R/W14_BC')
 
-    ## oppen packages
+
+    ## Packages
+
 library(ggplot2)
 
+
     ## 1) Parameters
-N0=1
-M0=1
-r=0.2
+
 K=1000000
-time=350
-rNT=0.9
-rMT=0.5
-    ## 2) equation 
-Ns=numeric(length = time)
-Ns[1]=N0
-Ms=numeric(length = time)
-Ms[1]=M0
+r=0.1
+Rn=-0.1
+Rm=0.05
+n0=99
+m0=1
+time=800
+n<-numeric(length = time)
+m<-numeric(length = time)
+n[1]=n0
+m[1]=m0
 
-Ns[i+1]=Ns[i]+r*Ns[i]*(1-(Ns[i]+Ms[i])/K)-Ns[i]*rNT
-Ms[i+1]=Ms[i]+r*Ms[i]*(1-(Ns[i]+Ms[i])/K)-Ms[i]*rMT
-Ns[i+1]=Ns[i]+r*Ns[i]*(1-(Ns[i]+Ms[i])/K)
-    
-    ## 3)Loop
-popsim1<-function(N0=1,M0=1,r=0.2,K=1000000,time=350,rNT=0.9,rMT=0.5){
-  Ns=numeric(length = time)
-  Ns[1]=N0
-  Ms=numeric(length = time)
-  Ms[1]=M0
-  for(i in 1:350){
-    if(i<=100){
-      Ms[i+1]=Ms[i]+r*Ms[i]*(1-(Ns[i]+Ms[i])/K)-Ms[i]*rMT
-    }else if(i>=999900)
-    Ns[i+1]=Ns[i]+r*Ns[i]*(1-(Ns[i]+Ms[i])/K)-Ns[i]*rNT
-  }else{
-    Ns[i+1]=Ns[i]+r*Ns[i]*(1-(Ns[i]+Ms[i])/K)
-  }
-  return(Ns)
-  return(Ms)
-}
+    ## 2) equations
+       
+        #No treatment
 
-   ## 4)Data frame
+    n[t+1]=n[t]+r*n[t]*(1-((n[t]+m[t])/K)) 
+    m[t+1]=m[t]+r*m[t]*(1-((n[t]+m[t])/K))
 
-Tumor1=data.frame(time=1:351)
-Tumor1$Mutant<-popsim1(rNT = -0.9,rMT = -0.5)
-Tumor1$NoMutant<-popsim()
-Tumor1$NoCancer<-popsim1(rNT = 0,rMT = 0)
+        # Treatment
+
+    n[t+1]=n[t]+Rn*n[t]*(1-((n[t]+m[t])/K)) 
+    m[t+1]=m[t]+Rm*m[t]*(1-((n[t]+m[t])/K))
+
+
+   ## 3) Function and loop
+
+cancer <- function(n0=99, m0=1, r=0.1, Rn=-0.1, Rm=0.05, K=1000000, time=800){
+  n<-numeric(length = time)
+  m<-numeric(length = time)
+  n[1]=n0
+  m[1]=m0
   
-   ## 5)Plot 
-
-dim(Tumor)
-ggplot(data=Tumor)+
-  geom_line(aes(x=time,y=Mutant),col="blue")+
-  geom_line(aes(x=time,y=NoMutant),col="pink")+
-  geom_line(aes(x=time,y=NoCancer),col="purple")+
-  theme_classic()
-
-
-
-###Dic8
-#parameters
-K=1000000
-KN=999900
-KM=100
-r=0.1
-rN=-0.1
-rM=-0.5
-time=365
-N0=1
-M0=0
-
-#equation
-N <- numeric(length = time)
-M <- numeric(length = time)
-
-N[1]=N0
-M[1]=M0
-
-N[i+1]=N[i]+r*N[i]*(1-(N[i]+M[i])/K)-N[i]*rN
-M[i+1]=M[i]+r*M[i]*(1-(N[i]+M[i])/K)-M[i]*rM
-
-# loop
-
-Drug<- function (N0=1, M0=0, r=0.1, K=1000000, rM=0.5,rN=0.9){
-  for (i in 1:(time-1)){
-  if(i<=100){
-    Mu<-M[i+1]=M[i]+r*M[i]*(1-(N[i]+M[i])/K)-M[i]*rM
-  }else{
-    No<-N[i+1]=N[i]+r*N[i]*(1-(N[i]+M[i])/K)-N[i]*rN
+  for(t in 1:(time-1)){
+    print(t)
+  if(t < 250){
+    n[t+1]=n[t]+r*n[t]*(1-((n[t]+m[t])/K)) 
+    m[t+1]=m[t]+r*m[t]*(1-((n[t]+m[t])/K))
   }
-  V<-cbind(Mu+No)
+  else
+  {
+    n[t+1]=n[t]+Rn*n[t]*(1-((n[t]+m[t])/K)) 
+    m[t+1]=m[t]+Rm*m[t]*(1-((n[t]+m[t])/K))
   }
+  }
+  return(data.frame(n,m))
 }
 
-Drug1<-data.frame(time-1)
-Drug1$Mutant<-Drug(rNT=0)
-Drug1$NoMutant<-Drug(rMT=0)
-Drug1$NoDrug<-Drug(rMT=0,rNT=0)
+    ## 4) Data frame with all the data
 
-dim(Drug1)
+PlotCancer <- cancer()
+head(PlotCancer)
+PlotCancer$time = 1:nrow(PlotCancer)
 
-ggplot(data=Drug1)+
-  geom_line(aes(x=time,y=Mutant),col="blue")+
-  geom_line(aes(x=time,y=NoMutant),col="pink")+
-  geom_line(aes(x=time,y=NoDrug),col="purple")+
+   ## 5) Plot
+
+ggplot(data=PlotCancer)+
+  geom_line(aes(x = time, y = n), col = "blue")+
+  geom_line(aes(x = time, y = m), col = "green")+
+  ylab("# Cells") + xlab("# Days") +
   theme_classic()
-
-
-#####
-
-#1______________________________________
-#initial conditions
-
-N0=99
-M0=1
-r=0.1
-rM=0.05
-rN=-0.1
-K=1000000
-time=364
-
-#equations
-N[i+1]=N[i]+r*N[i]*(1-(N[i]+M[i])/K)
-M[i+1]=M[i]+r*M[i]*(1-(N[i]+M[i])/K)
-
-N[i+1]=N[i]+rN*N[i]*(1-(N[i]+M[i])/K)
-M[i+1]=M[i]+rM*M[i]*(1-(N[i]+M[i])/K)
-
-N <- numeric(length = time)
-M <- numeric(length = time)
-N0=99
-M0=1
-N[1]=N0
-M[1]=M0
-
-#loop
-Population <- function(N0=99, M0=1, r=0.1, rM=0.05, rN=-0.1, K=1000000, time=364) {
-  for(i in 1:(time-1)){
-  #No treatment
-  if(i < 0.5*time){
-    N[i+1]=N[i]+r*N[i]*(1-(N[i]+M[i])/K)
-    M[i+1]=M[i]+r*M[i]*(1-(N[i]+M[i])/K)
-  }else{
-    N[i+1]=N[i]+rN*N[i]*(1-(N[i]+M[i])/K)
-    M[i+1]=M[i]+rM*M[i]*(1-(N[i]+M[i])/K)
-  }
-    return(data.frame(N,M))
-  }
-}
-
-graph<-Population()
-
-
-
-ggplot(data=graph)+
-  #geom_line(aes(x=time,y=N),col="blue")+
-  geom_line(aes(x=time,y=M),col="pink")+
-  #geom_line(aes(x=time,y=NoDrug),col="purple")+
-  theme_classic()
-#2____________________________________
-popsim<-function(N0=99,M0=1,r=0.1,K=1000000,time=350,rNT=-0.1,rMT=0.05,g=1){
-  Ns=numeric(length = time)
-  Ns[1]=N0
-  Ms=numeric(length = time)
-  Ms[1]=M0
-  for(i in 1:350){
-    if(i < 150){
-      Ns[i+1]=Ns[i]+r*Ns[i]*(1-(Ns[i]+Ms[i])/K)
-      Ms[i+1]=Ms[i]+r*Ms[i]*(1-(Ns[i]+Ms[i])/K)*g
-    }else(i > 151){
-      Ns[i+1]=Ns[i]+rNT*Ns[i]*(1-(Ns[i]+Ms[i])/K)
-      Ms[i+1]=Ms[i]+rMT*Ns[i]*(1-(Ns[i]+Ms[i])/K)*g
-    }
-    return(Ns)
-    return(Ms)
-  }
-}
-
-Tumor=data.frame(time=1:350)
-Tumor$N<-popsim(g = 0)#, K=100)
-#Tumor$NoMutant<-popsim(r= -0.1)
-Tumor$M<-popsim()
-
-dim(Tumor)
-ggplot(data=Tumor)+
-  geom_line(aes(x=time,y=N),col="blue")+
-  #geom_line(aes(x=time,y=NoMutant),col="pink")+
-  geom_line(aes(x=time,y=M),col="purple")+
-  theme_classic()
-
